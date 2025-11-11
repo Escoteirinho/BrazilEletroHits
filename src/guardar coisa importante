@@ -1,0 +1,15 @@
+TargetDataLine line;
+        File arquivo = new File("/home/sou_eu/Coisas do curso/Analise De Sinais/Arquivos/Áudios/");
+        AudioInputStream musica = AudioSystem.getAudioInputStream(arquivo);
+        DataLine.Info info = new DataLine.Info(TargetDataLine.class, musica.getFormat()); // format is an AudioFormat object
+        if (!AudioSystem.isLineSupported(info)) {
+            // Handle the error.
+            }
+            // Obtain and open the line.
+        try {
+            line = (TargetDataLine) AudioSystem.getLine(info);
+            line.open(musica.getFormat());
+        } catch (LineUnavailableException ex) {
+                // Handle the error.
+            //... 
+        }
