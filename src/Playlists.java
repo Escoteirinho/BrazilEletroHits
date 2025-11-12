@@ -16,17 +16,23 @@ public class Playlists {
         return;
     }
 
+    public double getTotalTimeSeconds() {
+        return totalTime;
+    }
+
     public void addMusica(Audio musica) {
         musicas.add(musica);
         calcularTotalTimeSeconds(musica);
         return;
     }
 
-    public double getTotalTimeSeconds() {
-        return totalTime;
+    public void removeMusica(int index) {
+        musicas.remove(index);
+        return;
     }
 
     public ArrayList<Audio> getListaMusicas() {
         return musicas;
     }
+
 }
