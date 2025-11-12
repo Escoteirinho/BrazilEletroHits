@@ -7,14 +7,22 @@ public class Audio{
     private AudioInputStream audio;
 
     public Audio(File arquivo) {
-        this.nome = arquivo.getNome();
-        this.audio = AudioSystem.getAudioInputStream(arquivo);
+        this.nome = arquivo.getName();
+        try {
+            this.audio = AudioSystem.getAudioInputStream(arquivo);
+        } catch (UnsupportedAudioFileException | java.io.IOException e) {
+            throw new IllegalArgumentException("Não foi possível abrir o arquivo de áudio: " + arquivo, e);
+        }
     }
 
     public String getName() {
         /* Retorna uma string com o nome do arquivo de audio */
         
         return nome;
+    }
+
+    public AudioInputStream getAudioStream() {
+        return audio;
     }
 
     public double getDuracaoSegundos() {

@@ -5,41 +5,43 @@ import javax.sound.sampled.*;
 public class MenuPrincipal {
     
     private ArrayList<Audio> listaDeReproducao;
-    private int index;
     private Clip clip;
 
     public MenuPrincipal() {
         this.listaDeReproducao = new ArrayList<>();
-        this.index = 0;
-        this.clip = AudioSystem.getClip();
+        try {
+            this.clip = AudioSystem.getClip();
+        } catch (LineUnavailableException e) {
+            throw new IllegalArgumentException("Não foi possivel localizar uma linha de saida de audio");
+        }
     }
 
-    private void menuOpcoes() {
+    private int menuOpcoes(int indexAtual) {
         /* Ferifica se existe algum input na tela enquanto o programa esta aberto, 
         por enquanto so tem os casos de controlar a musica q esta rolando no momento */
-
+        /*
         while(true) {
-            switch(/* Input da tela */) {
+            switch( Input da tela ) {
                 case "p":
-                    if (clip.isRunning()) {
-                        clip.stop();
-                    } else {
-                        // se chegou ao fim, reinicia antes de tocar
-                        if (clip.getFramePosition() >= clip.getFrameLength()) {
-                            clip.setFramePosition(0);
-                        }
-                        clip.start();
+                if (clip.isRunning()) {
+                    clip.stop();
+                } else {
+                    // se chegou ao fim, reinicia antes de tocar
+                    if (clip.getFramePosition() >= clip.getFrameLength()) {
+                        clip.setFramePosition(0);
                     }
-                    break;
-                case "restart":
-                    clip.stop();
-                    clip.setFramePosition(0);
                     clip.start();
-                    break;
+                }
+                break;
+                case "restart":
+                clip.stop();
+                clip.setFramePosition(0);
+                clip.start();
+                break;
                 case "stop":
-                    clip.stop();
-                    clip.setFramePosition(0);
-                    break;
+                clip.stop();
+                clip.setFramePosition(0);
+                break;
             }
         }
         if (clip.isRunning()) {
@@ -47,6 +49,8 @@ public class MenuPrincipal {
         }
         clip.close();
         return;
+        */
+        return 0;
     }
 
     public void playPlaylist(Playlists playlist, int index) {
@@ -57,8 +61,14 @@ public class MenuPrincipal {
         int tamanhoPlaylist = playlist.getListaMusicas().size();
         int indexAtual;
         for (indexAtual = index; indexAtual < tamanhoPlaylist; indexAtual++ ) {
-            clip.open(listaDeReproducao.get(indexAtual));
-            menuOpcoes();
+            try { 
+                clip.open(listaDeReproducao.get(indexAtual).getAudioStream());
+            } catch (LineUnavailableException | java.io.IOException e) {
+                throw new IllegalArgumentException("Formato não pode ser aberto na linha", e);
+            }
+            System.out.println("Tocando agora " + listaDeReproducao.get(indexAtual).getName());
+            clip.start();
+            indexAtual = menuOpcoes(indexAtual);
         }
         return;
     }

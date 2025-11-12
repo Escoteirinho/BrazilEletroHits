@@ -11,6 +11,12 @@ public class Playlists {
         this.musicas = new ArrayList<>();
     }
 
+    public String getName() {
+        /* Retorna uma string com o nome do arquivo de audio */
+        
+        return nome;
+    }
+
     private void calcularTotalTimeSeconds(Audio musica) {
         totalTime += musica.getDuracaoSegundos();
         return;
