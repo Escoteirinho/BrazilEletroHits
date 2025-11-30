@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FilenameFilter;
 
 public class App extends Application {
 
@@ -14,9 +16,53 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("primary.fxml"));
+        Parent root = loader.load();
+        scene = new Scene(root, 640, 480);
         stage.setScene(scene);
         stage.show();
+        stage.setTitle("BrazilElectroHits");
+
+        // try to load persisted playlist or build from music folder
+        Playlists allAudios = null;
+        MenuPrincipal controleDeFaixas = loader.getController();
+        File diretorio = new File("music");
+        FilenameFilter wavFilter = (dir, name) -> name.toLowerCase().endsWith(".wav");
+        File[] listaArquivos = diretorio.listFiles(wavFilter);
+
+        try {
+            File playlistFile = new File("playlist.xml");
+            if (playlistFile.exists()) {
+                allAudios = Playlists.loadFromXml(playlistFile);
+            }
+        } catch (Exception e) {
+            System.out.println("Falha ao carregar playlist.xml: " + e.getMessage());
+        }
+
+        if (allAudios == null) {
+            if (listaArquivos == null || listaArquivos.length == 0) {
+                System.out.println("Diretório vazio ou inválido: " + diretorio.getAbsolutePath());
+            } else {
+                allAudios = new Playlists("Musicas");
+                for (File f : listaArquivos) {
+                    try {
+                        Audio musica = new Audio(f);
+                        allAudios.addMusica(musica);
+                    } catch (Exception ex) {
+                        System.out.println("Ignorando arquivo inválido: " + f.getName());
+                    }
+                }
+                try {
+                    allAudios.saveToXml(new File("playlist.xml"));
+                } catch (Exception ex) {
+                    System.out.println("Não foi possível salvar playlist.xml: " + ex.getMessage());
+                }
+            }
+        }
+
+        if (allAudios != null) {
+            controleDeFaixas.playPlaylist(allAudios, 0);
+        }
     }
 
     static void setRoot(String fxml) throws IOException {

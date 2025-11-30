@@ -22,7 +22,14 @@
             <Insets />
          </opaqueInsets>
       </Label>
+      <Button fx:id="managePlaylistButton" layoutX="600.0" layoutY="30.0" prefHeight="25.0" prefWidth="60.0" style="-fx-background-color: #666666; -fx-text-fill: white;" text="☰" onAction="#openPlaylistManager">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Button>
       <ProgressBar fx:id="barraprogresso" layoutX="100.0" layoutY="331.0" prefHeight="23.0" prefWidth="469.0" progress="0.0" style="-fx-accent: #18f000ff;" />
+      <Label fx:id="timeLabel" layoutX="100.0" layoutY="360.0" textFill="WHITE" text="00:00 / 00:00" />
+      <ListView fx:id="playlistView" layoutX="20.0" layoutY="110.0" prefHeight="120.0" prefWidth="640.0" onMouseClicked="#playlistClicked" />
       <ToolBar fx:id="toolbar" layoutY="267.0" prefHeight="45.0" prefWidth="680.0" style="-fx-background-color: #45433c;">
         <items>
             <Region prefHeight="31.0" prefWidth="217.0" />

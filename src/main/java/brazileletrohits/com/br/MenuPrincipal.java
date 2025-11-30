@@ -14,13 +14,20 @@ import javax.sound.sampled.LineUnavailableException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.application.Platform;
+import javax.sound.sampled.AudioFormat;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
+import javafx.collections.FXCollections;
+import javafx.scene.input.MouseEvent;
 
 
 public class MenuPrincipal {
@@ -47,6 +54,13 @@ public class MenuPrincipal {
     private AnchorPane ancora;
     @FXML
     private Label title;
+    @FXML
+    private Label timeLabel;
+    @FXML
+    private ListView<String> playlistView;
+
+    @FXML
+    private Button managePlaylistButton;
 
     public MenuPrincipal() {
         this.listaDeReproducao = new ArrayList<>();
@@ -66,22 +80,43 @@ public class MenuPrincipal {
         if (index < 0 || index >= listaDeReproducao.size()) 
             return;
         try {
-            manualStop = false;
-            if (clip.isOpen()) {
-                clip.close();
+            synchronized (this) {
+                manualStop = false;
+                // remove previous listener and close existing clip safely
+                try {
+                    if (musicaLinha != null && clip != null) {
+                        clip.removeLineListener(musicaLinha);
+                    }
+                } catch (Exception ex) {
+                }
+                try {
+                    if (clip != null && clip.isOpen()) {
+                        clip.stop();
+                        clip.flush();
+                        clip.close();
+                    }
+                } catch (Exception ex) {
+                }
+
+                // create and open a fresh Clip for this file
+                File file = listaDeReproducao.get(index).getFile();
+                AudioInputStream musica = AudioSystem.getAudioInputStream(file);
+                Clip newClip = AudioSystem.getClip();
+                newClip.open(musica);
+                clip = newClip;
+                clip.setFramePosition(0);
+                System.out.println("Tocando agora " + listaDeReproducao.get(index).getName());
+                if (title != null) {
+                    Platform.runLater(() -> title.setText(listaDeReproducao.get(index).getName()));
+                }
+                // update play button to show pause
+                if (playbutton != null) {
+                    Platform.runLater(() -> playbutton.setText("⏸"));
+                }
+                fimMusica();
+                iniciarBarraProgresso();
+                clip.start();
             }
-            // Gere um novo arquivo de musica toda vez, evitando que de problema e nao tocar.
-            File file = listaDeReproducao.get(index).getFile();
-            AudioInputStream musica = AudioSystem.getAudioInputStream(file);
-            clip.open(musica);
-            clip.setFramePosition(0);
-            System.out.println("Tocando agora " + listaDeReproducao.get(index).getName());
-            if (title != null) {
-                title.setText(listaDeReproducao.get(index).getName());
-            }
-            fimMusica();
-            iniciarBarraProgresso();
-            clip.start();
         } catch (Exception e) {
             System.out.println("Falha ao abrir áudio: " + e.getMessage());
         }
@@ -117,6 +152,7 @@ public class MenuPrincipal {
         if (clip.isRunning()) {
             manualStop = true;
             clip.stop();
+            if (playbutton != null) Platform.runLater(() -> playbutton.setText("▶"));
         } else {
             // se chegou ao fim, reinicia antes de tocar
             if (clip.getFramePosition() >= clip.getFrameLength()) {
@@ -124,6 +160,7 @@ public class MenuPrincipal {
             }
             manualStop = false;
             clip.start();
+            if (playbutton != null) Platform.runLater(() -> playbutton.setText("⏸"));
         }
     } 
 
@@ -170,6 +207,30 @@ public class MenuPrincipal {
             if (progresso >= 1.0 || !clip.isRunning()) {
                 barraProgresso.stop();
             }
+            // atualizar tempo
+            if (timeLabel != null) {
+                try {
+                    double atual = 0;
+                    double total = 0;
+                    Audio current = listaDeReproducao.get(indexAtual);
+                    total = current.getDuracaoSegundos();
+                    AudioFormat formato = null;
+                    try {
+                        formato = current.getAudioStream().getFormat();
+                    } catch (Exception ex) {
+                        formato = null;
+                    }
+                    if (formato != null) {
+                        atual = clip.getFramePosition() / formato.getFrameRate();
+                    } else if (clip.getFrameLength() > 0) {
+                        atual = (double) clip.getFramePosition() / clip.getFrameLength() * total;
+                    }
+                    final String text = String.format("%02d:%02d / %02d:%02d",
+                            (int) (atual / 60), (int) (atual % 60), (int) (total / 60), (int) (total % 60));
+                    Platform.runLater(() -> timeLabel.setText(text));
+                } catch (Exception ex) {
+                }
+            }
         }
     }
 @FXML
@@ -177,6 +238,9 @@ private void initialize() {
     if (volume != null) {
         volume.setValue(100); // valor inicial máximo
         volume.valueProperty().addListener((obs, oldVal, newVal) -> ajustarVolume(newVal.intValue()));
+    }
+    if (playlistView != null) {
+        playlistView.setItems(FXCollections.observableArrayList());
     }
 }
 
@@ -209,6 +273,30 @@ private void ajustarVolume(int valor) {
         if (index < 0 || index >= listaDeReproducao.size()) 
             indexAtual = 0;
         else indexAtual = index;
+        // populate playlist view
+        if (playlistView != null) {
+            ArrayList<String> names = new ArrayList<>();
+            for (Audio a : listaDeReproducao) names.add(a.getName());
+            Platform.runLater(() -> playlistView.setItems(FXCollections.observableArrayList(names)));
+            if (!names.isEmpty()) Platform.runLater(() -> playlistView.getSelectionModel().select(indexAtual));
+        }
         tocar(indexAtual);
+    }
+
+    @FXML
+    private void playlistClicked(MouseEvent event) {
+        if (event.getClickCount() == 2 && playlistView != null) {
+            int idx = playlistView.getSelectionModel().getSelectedIndex();
+            if (idx >= 0 && idx < listaDeReproducao.size()) {
+                indexAtual = idx;
+                tocar(indexAtual);
+            }
+        }
+    }
+
+    @FXML
+    private void openPlaylistManager() {
+        PlaylistEditorWindow editor = new PlaylistEditorWindow(this, listaDeReproducao);
+        editor.show();
     }
 }
