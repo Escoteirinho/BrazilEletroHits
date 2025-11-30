@@ -20,12 +20,7 @@ public class Audio {
 
     public String getName() {
         /* Retorna uma string com o nome do arquivo de audio */
-        
         return nome;
-    }
-
-    public AudioInputStream getAudioStream() {
-        return audio;
     }
 
     public File getFile(){
