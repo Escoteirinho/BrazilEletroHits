@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<playlist>
+    <audio>
+        <name>Dumb.wav</name>
+        <path>music\Dumb.wav</path>
+    </audio>
+    <audio>
+        <name>INVISIBLE.wav</name>
+        <path>music\INVISIBLE.wav</path>
+    </audio>
+    <name>Playlist1</name>
+</playlist>

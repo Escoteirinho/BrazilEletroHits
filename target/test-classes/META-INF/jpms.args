@@ -1,0 +1,4 @@
+--patch-module
+brazileletrohits.com.br=_
+--add-reads
+brazileletrohits.com.br=ALL-UNNAMED

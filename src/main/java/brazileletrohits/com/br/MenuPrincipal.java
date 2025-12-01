@@ -14,6 +14,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.application.Platform;
 import javax.sound.sampled.AudioFormat;
 import javafx.scene.control.Button;
@@ -23,8 +24,11 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.collections.FXCollections;
 import javafx.scene.input.MouseEvent;
@@ -82,7 +86,6 @@ public class MenuPrincipal {
         try {
             synchronized (this) {
                 manualStop = false;
-                // remove previous listener and close existing clip safely
                 try {
                     if (musicaLinha != null && clip != null) {
                         clip.removeLineListener(musicaLinha);
@@ -98,7 +101,7 @@ public class MenuPrincipal {
                 } catch (Exception ex) {
                 }
 
-                // create and open a fresh Clip for this file
+                // Cria e abre uma nova instancia do arquivo
                 File file = listaDeReproducao.get(index).getFile();
                 AudioInputStream musica = AudioSystem.getAudioInputStream(file);
                 Clip newClip = AudioSystem.getClip();
@@ -109,20 +112,23 @@ public class MenuPrincipal {
                 if (title != null) {
                     Platform.runLater(() -> title.setText(listaDeReproducao.get(index).getName()));
                 }
-                // update play button to show pause
+                // Alterna entre o botao de play e de pause
                 if (playbutton != null) {
                     Platform.runLater(() -> playbutton.setText("⏸"));
                 }
                 fimMusica();
                 iniciarBarraProgresso();
                 clip.start();
+                if (volume != null) {
+                ajustarVolume((int) volume.getValue());
+            }
             }
         } catch (Exception e) {
             System.out.println("Falha ao abrir áudio: " + e.getMessage());
         }
     }
 
-    // Passa para a proxima musica quando termina atual
+    // Passa para a proxima musica quando termina a atual
     private void fimMusica() {
         // Remove a musica antiga da linha de reproducao
         if (musicaLinha != null) {
@@ -145,7 +151,7 @@ public class MenuPrincipal {
         tocar(indexAtual);
     }
 
-    // Usa o OnAction dos botoes para fazer as acoes. Lembrando que o JAVAFX roda tudo diretamente em um loop interno.
+    // Usa o OnAction dos botoes para fazer as acoes. Lembrando que o JAVAFX roda tudo diretamente em um loop interno
     @FXML
     public void play(){
         if (clip == null) return;
@@ -236,7 +242,7 @@ public class MenuPrincipal {
 @FXML
 private void initialize() {
     if (volume != null) {
-        volume.setValue(100); // valor inicial máximo
+        volume.setValue(50); // valor inicial do volume
         volume.valueProperty().addListener((obs, oldVal, newVal) -> ajustarVolume(newVal.intValue()));
     }
     if (playlistView != null) {
@@ -273,10 +279,10 @@ private void ajustarVolume(int valor) {
         if (index < 0 || index >= listaDeReproducao.size()) 
             indexAtual = 0;
         else indexAtual = index;
-        // populate playlist view
+        // Visualizacao das playlists
         if (playlistView != null) {
             ArrayList<String> names = new ArrayList<>();
-            for (Audio a : listaDeReproducao) names.add(a.getName());
+            for (Audio aud : listaDeReproducao) names.add(aud.getName());
             Platform.runLater(() -> playlistView.setItems(FXCollections.observableArrayList(names)));
             if (!names.isEmpty()) Platform.runLater(() -> playlistView.getSelectionModel().select(indexAtual));
         }
@@ -294,9 +300,23 @@ private void ajustarVolume(int valor) {
         }
     }
 
+
+    // Abre a janela de gerenciamento de playlists
     @FXML
     private void openPlaylistManager() {
-        PlaylistEditorWindow editor = new PlaylistEditorWindow(this, listaDeReproducao);
-        editor.show();
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("playlist.fxml"));
+        loader.setController(new PlaylistEditorWindow(this, listaDeReproducao));
+        Parent root = loader.load();
+        Stage stage = new Stage();
+        stage.setTitle("Editor de Playlist");
+        stage.setScene(new Scene(root));
+        stage.setResizable(false);
+        stage.show();
+    } catch (Exception e) {
+        e.printStackTrace();
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao abrir editor de playlist: " + e.getMessage());
+        alert.showAndWait();
+        }
     }
 }

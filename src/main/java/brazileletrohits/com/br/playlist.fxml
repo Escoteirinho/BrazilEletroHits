@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <VBox spacing="10">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+           <children>
+               <HBox spacing="10">
+                  <children>
+                      <Label text="Nome da Playlist:" />
+                      <TextField fx:id="playlistNameField" prefWidth="300" />
+                  </children>
+               </HBox>
+               <HBox spacing="10">
+                  <children>
+                      <Label text="Carregar salva:" />
+                      <ComboBox fx:id="savedPlaylists" prefWidth="200" />
+                      <Button fx:id="loadBtn" text="Carregar" />
+                  </children>
+               </HBox>
+           </children>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="20">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+           <children>
+               <VBox spacing="10">
+                  <children>
+                      <Label text="Músicas Disponíveis:" />
+                      <ListView fx:id="availableList" prefHeight="300" prefWidth="200" />
+                  </children>
+               </VBox>
+               <VBox alignment="CENTER" spacing="10">
+                  <children>
+                      <Button fx:id="addBtn" prefWidth="120" text="  &gt;&gt; Adicionar" />
+                      <Button fx:id="removeBtn" prefWidth="120" text="Remover &lt;&lt;" />
+                  </children>
+               </VBox>
+               <VBox spacing="10">
+                  <children>
+                      <Label text="Playlist Atual:" />
+                      <ListView fx:id="playlistList" prefHeight="300" prefWidth="200" />
+                  </children>
+               </VBox>
+           </children>
+        </HBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+           <children>
+               <Button fx:id="playBtn" text="▶ Tocar Playlist" />
+               <Button fx:id="saveBtn" text="💾 Salvar" />
+               <Button fx:id="deleteBtn" text="🗑 Deletar Salva" />
+               <Button fx:id="closeBtn" text="Fechar" />
+           </children>
+        </HBox>
+    </bottom>
+
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10" />
+    </padding>
+</BorderPane>

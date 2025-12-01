@@ -27,6 +27,10 @@ public class Audio {
         return file;
     }
 
+    public AudioInputStream getAudioStream() {
+        return audio;
+    }
+
     public double getDuracaoSegundos() {
         /* Retorna um double com a duração em segundos do audio 
         atraves da quantidade de frames e o frame rate do audio */

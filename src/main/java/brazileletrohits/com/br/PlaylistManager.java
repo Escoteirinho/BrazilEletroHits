@@ -14,7 +14,8 @@ public class PlaylistManager {
         }
     }
 
-    // Save a playlist with a custom name
+    // Essa classe gerencia a persistencia dos arquivos de playlist
+
     public static void savePlaylist(String playlistName, Playlists playlist) throws Exception {
         File dir = new File(PLAYLISTS_DIR);
         if (!dir.exists()) dir.mkdir();
@@ -22,7 +23,6 @@ public class PlaylistManager {
         playlist.saveToXml(file);
     }
 
-    // Load a playlist by name
     public static Playlists loadPlaylist(String playlistName) throws Exception {
         File dir = new File(PLAYLISTS_DIR);
         File file = new File(dir, sanitizeName(playlistName) + ".xml");
@@ -30,7 +30,6 @@ public class PlaylistManager {
         return Playlists.loadFromXml(file);
     }
 
-    // List all saved playlists
     public static List<String> listPlaylists() {
         List<String> names = new ArrayList<>();
         File dir = new File(PLAYLISTS_DIR);
@@ -39,14 +38,13 @@ public class PlaylistManager {
             if (files != null) {
                 for (File f : files) {
                     String name = f.getName();
-                    names.add(name.substring(0, name.length() - 4)); // remove .xml
+                    names.add(name.substring(0, name.length() - 4));
                 }
             }
         }
         return names;
     }
 
-    // Delete a saved playlist
     public static boolean deletePlaylist(String playlistName) {
         File dir = new File(PLAYLISTS_DIR);
         File file = new File(dir, sanitizeName(playlistName) + ".xml");

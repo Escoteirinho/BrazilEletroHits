@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<playlist>
+    <audio>
+        <name>INVISIBLE.wav</name>
+        <path>music\INVISIBLE.wav</path>
+    </audio>
+    <audio>
+        <name>The Only Exception.wav</name>
+        <path>music\The Only Exception.wav</path>
+    </audio>
+    <audio>
+        <name>Dumb.wav</name>
+        <path>music\Dumb.wav</path>
+    </audio>
+    <name>Playlist3</name>
+</playlist>

@@ -9,7 +9,6 @@ public class AudioDTO {
     private String path;
 
     public AudioDTO() {
-        // JAXB needs no-arg constructor
     }
 
     public AudioDTO(String name, String path) {

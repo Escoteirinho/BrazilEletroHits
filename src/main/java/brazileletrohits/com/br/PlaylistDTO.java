@@ -5,6 +5,8 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+//Classe para persistencia com XML
+
 @XmlRootElement(name = "playlist")
 public class PlaylistDTO {
     private String name;

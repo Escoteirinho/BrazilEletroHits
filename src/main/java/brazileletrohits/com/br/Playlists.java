@@ -43,7 +43,7 @@ public class Playlists {
         return musicas;
     }
 
-    // Save playlist to XML file (serializes paths and names)
+    // Salva a playlist em um arquivo XML
     public void saveToXml(File xmlFile) throws Exception {
         PlaylistDTO dto = new PlaylistDTO(this.nome);
         List<AudioDTO> entries = new ArrayList<>();
@@ -59,25 +59,23 @@ public class Playlists {
         m.marshal(dto, xmlFile);
     }
 
-    // Load playlist from XML file, converting DTOs into Audio objects.
+    // Pega o arquivo XML e transforma em DTO
     public static Playlists loadFromXml(File xmlFile) throws Exception {
         JAXBContext ctx = JAXBContext.newInstance(PlaylistDTO.class, AudioDTO.class);
         Unmarshaller u = ctx.createUnmarshaller();
         PlaylistDTO dto = (PlaylistDTO) u.unmarshal(xmlFile);
-        Playlists p = new Playlists(dto.getName());
+        Playlists playlist = new Playlists(dto.getName());
         if (dto.getAudios() != null) {
             for (AudioDTO adto : dto.getAudios()) {
                 try {
-                    File f = new File(adto.getPath());
-                    if (f.exists()) {
-                        Audio audio = new Audio(f);
-                        p.addMusica(audio);
+                    File file = new File(adto.getPath());
+                    if (file.exists()) {
+                        Audio audio = new Audio(file);
+                        playlist.addMusica(audio);
                     }
-                } catch (Exception ex) {
-                    // ignore bad entries
-                }
+                } catch (Exception ex) {}
             }
         }
-        return p;
+        return playlist;
     }
 }

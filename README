@@ -1,0 +1,14 @@
+BrazilEletroHits é um programa feito para ler e organizar arquivos .WAV.
+
+Para usar é só instalar o programa e colocar suas músicas dentro da pasta 'music'. É importante que as dependências de JAVAFX também estejam devidamente instaladas.
+
+Com as músicas salvas você pode escutá-las de uma forma melhor, podendo alterar o volume diretamente no aplicativo, avançar ou retornar entre as músicas e pausá-las.
+
+Também há o gerenciamento de playlists, onde há a possibilidade de organizar as músicas na ordem desejada e em grupos separados.~
+
+Contribuidores:
+
+Andrei de Oliveira Athaide 221935
+Miguel Araujo Silva 183055
+João Eduardo Rizzo Silva 281253
+Renato Lörli 276972
